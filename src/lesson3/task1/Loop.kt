@@ -196,7 +196,52 @@ fun hasDifferentDigits(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int = when (n) {
+    1 -> 1
+    2 -> 4
+    3 -> 9
+    else -> findDigit(n)
+}
+
+fun findDigit(n: Int): Int {
+    var sum = 3
+    var j = 1
+    var k = 100.0
+
+    var highb = 9
+    var lowb = sqrt(highb + 1.0).toInt() + 1
+
+    do {
+        j++
+
+        for (i in lowb..highb) {
+            if (sum + j >= n) return takeDigit(i * i, j, n - sum)
+            sum += j
+        }
+
+        if (j and 1 == 0) {
+            lowb = highb + 1
+            highb = sqrt(lowb * k).toInt()
+            k *= 10
+        } else {
+            val tmp = lowb
+            lowb = highb + 1
+            highb = tmp * 10 - 1
+        }
+
+    } while (true)
+}
+
+fun takeDigit(n: Int, numOfDigits: Int, p: Int): Int {
+    var tmp = 0
+    var tmpn = n
+
+    for (i in p..numOfDigits) {
+        tmp = tmpn % 10
+        tmpn /= 10
+    }
+    return tmp
+}
 
 /**
  * Сложная
@@ -207,4 +252,49 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int = when (n) {
+    1 -> 1
+    2 -> 1
+    else -> findFibDigit(n)
+}
+
+fun findFibDigit(n: Int): Int {
+    var sum: Long = 2
+    var a: Long = 1
+    var b: Long = 1
+    var t: Long = 10
+    var j = 1
+
+    for (i in 3..n) {
+        val fib = a + b
+
+        if (fib - t >= 0) {
+            t *= 10
+            j++
+        }
+
+        sum += j
+
+        if (sum - n >= 0) {
+            return if (j == 1) fib.toInt() else takeDigit(fib, j, j - (sum - n))
+        }
+
+        if (i and 1 == 1) {
+            a = fib
+        } else {
+            b = fib
+        }
+    }
+    return -1
+}
+
+fun takeDigit(n: Long, numOfDigits: Int, p: Long): Int {
+    var tmp: Long = 0
+    var tmpn: Long = n
+
+    for (i in p..numOfDigits) {
+        tmp = tmpn % 10
+        tmpn /= 10
+    }
+    return tmp.toInt()
+}

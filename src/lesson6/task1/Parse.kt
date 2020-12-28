@@ -2,6 +2,10 @@
 
 package lesson6.task1
 
+import java.lang.Exception
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
+
 /**
  * Пример
  *
@@ -208,4 +212,89 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+
+var position = 0
+var commandPosition = 0
+var line = mutableListOf<Int>()
+var lim = 0
+var level = 0
+
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    init()
+    checkSymbols(commands)
+    position = cells / 2
+    line = MutableList(cells) { 0 }
+    lim = limit
+
+    while (commandPosition < commands.length && lim > 0) {
+        translate(commands, line)
+        lim--
+    }
+
+    return line.toList()
+}
+
+fun translate(commands: String, line: MutableList<Int>) = when (commands[commandPosition]) {
+    '>' -> {
+        position++
+        if (position >= line.size) throw IllegalStateException()
+        else commandPosition++
+    }
+    '<' -> {
+        position--
+        if (position < 0) throw IllegalStateException()
+        else commandPosition++
+    }
+    '+' -> {
+        line[position]++
+        commandPosition++
+    }
+    '-' -> {
+        line[position]--
+        commandPosition++
+    }
+    '[' -> {
+        if (line[position] == 0) {
+            while (commandPosition < commands.length) {
+                if (commands[commandPosition] == '[') level++
+                else if (commands[commandPosition] == ']') {
+                    level--
+                    if (level == 0) break
+                }
+                commandPosition++
+            }
+            commandPosition++
+        } else commandPosition++
+    }
+    ']' -> {
+        if (line[position] != 0) {
+            while (commandPosition > 0) {
+                if (commands[commandPosition] == ']') level++
+                else if (commands[commandPosition] == '[') {
+                    level--
+                    if (level == 0) break
+                }
+                commandPosition--
+            }
+            commandPosition++
+        } else commandPosition++
+    }
+    else -> commandPosition++
+}
+
+fun checkSymbols(commands: String) {
+    for (i in commands.indices) {
+        if (!listOf('>', '<', '+', '-', '[', ']', ' ').contains(commands[i])) throw IllegalArgumentException()
+        if (commands[i] == '[') level++
+        if (commands[i] == ']') level--
+    }
+    if (level != 0) throw IllegalArgumentException()
+}
+
+fun init() {
+    position = 0
+    commandPosition = 0
+    level = 0
+    line = mutableListOf<Int>()
+    lim = 0
+}

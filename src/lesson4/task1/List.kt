@@ -245,4 +245,90 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+val ones: List<String> = listOf("один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+
+fun russian(n: Int): String {
+    val nums = splitNums(n)
+
+    if (nums.count() == 1) return ones[nums[0] - 1]
+
+    val rezArr = arrayOfNulls<String>(nums.count())
+
+    rezArr[1] = getTens(nums[1], nums[0])
+
+    if (nums[1] != 1 && nums[0] != 0) rezArr[0] = ones[nums[0] - 1]
+    else rezArr[0] = ""
+
+    if (nums.count() == 2) return rezArr.reversedArray().joinToString(separator = " ").replace("\\s{2,}".toRegex(), " ").trim()
+
+    rezArr[2] = getHunds(nums[2])
+
+    if (nums.count() == 3) return rezArr.reversedArray().joinToString(separator = " ").replace("\\s{2,}".toRegex(), " ").trim()
+
+    rezArr[3] = when (nums[3]) {
+        0 -> ""
+        1 -> "тысяча"
+        2 -> "две тысячи"
+        3 -> "три тысячи"
+        4 -> "четыре тысячи"
+        else -> ones[nums[3] - 1] + " тысяч"
+    }
+
+    if (nums.count() == 4) return rezArr.reversedArray().joinToString(separator = " ").replace("\\s{2,}".toRegex(), " ").trim()
+
+    rezArr[4] = getTens(nums[4], nums[3])
+
+    if (nums[4] != 1) rezArr[3] = when (nums[3]) {
+        0 -> "тысяч"
+        1 -> "одна тысяча"
+        2 -> "две тысячи"
+        3 -> "три тысячи"
+        4 -> "четыре тысячи"
+        else -> ones[nums[3] - 1] + " тысяч"
+    }
+    else rezArr[3] = "тысяч"
+
+    if (nums.count() == 5) return rezArr.reversedArray().joinToString(separator = " ").replace("\\s{2,}".toRegex(), " ").trim()
+
+    rezArr[5] = getHunds(nums[5])
+
+    return rezArr.reversedArray().joinToString(separator = " ").replace("\\s{2,}".toRegex(), " ").trim()
+}
+
+fun getHunds(n: Int): String = when (n) {
+    0 -> ""
+    1 -> "сто"
+    2 -> "двести"
+    3 -> "триста"
+    4 -> "четыреста"
+    else -> ones[n - 1] + "сот"
+}
+
+fun getTens(n: Int, nsecond: Int): String = when (n) {
+    0 -> ""
+    1 -> when (nsecond) {
+        0 -> "десять"
+        1 -> "одиннадцать"
+        2 -> "двенадцать"
+        3 -> "тринадцать"
+        else -> ones[nsecond - 1].dropLast(1) + "надцать"
+    }
+    2 -> "двадцать"
+    3 -> "тридцать"
+    4 -> "сорок"
+    9 -> "девяносто"
+    else -> ones[n - 1] + "десят"
+}
+
+fun splitNums(n: Int): MutableList<Int> {
+    var tmp = n
+    val nums: MutableList<Int> = mutableListOf(n % 10)
+    tmp /= 10
+
+    while (tmp > 0) {
+        nums.add(tmp % 10)
+        tmp /= 10
+    }
+
+    return nums
+}

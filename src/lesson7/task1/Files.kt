@@ -2,7 +2,9 @@
 
 package lesson7.task1
 
+import java.io.BufferedWriter
 import java.io.File
+import java.util.Stack
 
 /**
  * Пример
@@ -244,21 +246,65 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * Соответствующий выходной файл:
 <html>
-    <body>
-        <p>
-            Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
-            Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
-        </p>
-        <p>
-            Suspendisse <s>et elit in enim tempus iaculis</s>.
-        </p>
-    </body>
+<body>
+<p>
+Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+</body>
 </html>
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+fun markdownToHtmlSimple(inputName: String, outputName: String) { //not working
+    val outputStream = File(outputName).bufferedWriter()
+    outList.add("<p>")
+
+    for (line in File(inputName).readLines()) {
+        if (line.isEmpty()) {
+            outList.add("</p>")
+            outList.add("<p>")
+        }
+
+        outList.add(toCrossed(toItalic(toBold(toBoldItalic(line)))))
+    }
+
+    outList.add("</p>")
+
+    outputStream.appendln("<html>")
+    outputStream.appendln("<body>")
+
+    for (string in outList) {
+        outputStream.appendln(string)
+    }
+
+    outputStream.appendln("</body>")
+    outputStream.appendln("</html>")
+
+    outputStream.close()
+}
+
+fun toBoldItalic(line: String): String {
+    val regex = "([*]{3})(.*?)\\1".toRegex()
+    return line.replace(regex, "<b><i>" + "$2" + "</i></b>")
+}
+
+fun toBold(line: String): String {
+    val regex = "([*]{2})(.*?)\\1".toRegex()
+    return line.replace(regex, "<b>" + "$2" + "</b>")
+}
+
+fun toItalic(line: String): String {
+    val regex = "(\\*)(.*?)\\1".toRegex()
+    return line.replace(regex, "<i>" + "$2" + "</i>")
+}
+
+fun toCrossed(line: String): String {
+    val regex = "(~~)(.*?)\\1".toRegex()
+    return line.replace(regex, "<s>" + "$2" + "</s>")
 }
 
 /**
@@ -295,73 +341,166 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
-    1. Мясо
-        * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
-* Помидоры
-* Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-  <body>
+<body>
+<ul>
+<li>
+Утка по-пекински
     <ul>
-      <li>
-        Утка по-пекински
-        <ul>
-          <li>Утка</li>
-          <li>Соус</li>
-        </ul>
-      </li>
-      <li>
-        Салат Оливье
-        <ol>
-          <li>Мясо
-            <ul>
-              <li>
-                  Или колбаса
-              </li>
-            </ul>
-          </li>
-          <li>Майонез</li>
-          <li>Картофель</li>
-          <li>Что-то там ещё</li>
-        </ol>
-      </li>
-      <li>Помидоры</li>
-      <li>
-        Фрукты
-        <ol>
-          <li>Бананы</li>
-          <li>
-            Яблоки
-            <ol>
-              <li>Красные</li>
-              <li>Зелёные</li>
-            </ol>
-          </li>
-        </ol>
-      </li>
+        <li>Утка</li>
+        <li>Соус</li>
     </ul>
-  </body>
+</li>
+<li>
+Салат Оливье
+    <ol>
+        <li>Мясо
+            <ul>
+                <li>
+                Или колбаса
+</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>
+Фрукты
+<ol>
+<li>Бананы</li>
+<li>
+Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+
+var prevSpaces = 0
+val outList = mutableListOf<String>()
+val nestedLists = Stack<String>()
+
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val outputStream = File(outputName).bufferedWriter()
+
+    val possibleList = "^((    )*?)(\\*).+?(\\3)".toRegex()
+
+    for (line in File(inputName).readLines()) {
+        if (possibleList.find(line) != null) matchIfPossibleList(line)
+        else matchIfList(line)
+    }
+
+    emptyStack()
+
+    outputStream.appendln("<html>")
+    outputStream.appendln("<body>")
+
+    for (string in outList) {
+        outputStream.appendln(string)
+    }
+
+    outputStream.appendln("</body>")
+    outputStream.appendln("</html>")
+
+    outputStream.close()
+
+    outList.clear()
+
+}
+
+fun matchIfPossibleList(line: String) {
+    val regex = "(\\*)".toRegex()
+
+    if (regex.findAll(line).count() and 1 == 1) {
+        matchIfList(line)
+    } else {
+        emptyStack()
+        outList.add(line)
+    }
+}
+
+fun matchIfList(line: String) {
+    val regex = "^((    )*?)(\\*|\\d+\\.)(.*?\$)".toRegex()
+    val match = regex.find(line)
+
+    if (match != null) {
+        val currSpaces = match.groups[1]!!.value.count()
+
+        if (nestedLists.empty() or (currSpaces > prevSpaces)) {
+            if (currSpaces > prevSpaces) {
+                outList.removeAt(outList.count() - 1)
+                nestedLists.push("</li>")
+            }
+
+            val marker = match.groups[3]!!.value
+            nestedLists.push(translateToCloseTag(marker))
+            outList.add(translateToOpenTag(marker))
+            outList.add("<li>" + match.groups[4]!!.value)
+            outList.add("</li>")
+            prevSpaces = currSpaces
+        } else {
+            if (currSpaces == prevSpaces) {
+                outList.add("<li>" + match.groups[4]!!.value)
+                outList.add("</li>")
+            } else {
+                outList.add(nestedLists.pop())
+                outList.add(nestedLists.pop())
+                outList.add("<li>" + match.groups[4]!!.value)
+                outList.add("</li>")
+                prevSpaces = currSpaces
+            }
+        }
+    } else {
+        emptyStack()
+        outList.add(line)
+    }
+}
+
+fun emptyStack() {
+    while (!nestedLists.empty()) {
+        outList.add(nestedLists.pop())
+    }
+}
+
+fun translateToOpenTag(marker: String): String = when (marker) {
+    "*" -> "<ul>"
+    else -> "<ol>"
+}
+
+fun translateToCloseTag(marker: String): String = when (marker) {
+    "*" -> "</ul>"
+    else -> "</ol>"
 }
 
 /**
@@ -373,8 +512,9 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  *
  */
 fun markdownToHtml(inputName: String, outputName: String) {
-    TODO()
+    
 }
+
 
 /**
  * Средняя
@@ -382,23 +522,23 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-  235
-*  10
+235
+ *  10
 -----
-    0
+0
 +235
 -----
- 2350
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
@@ -412,16 +552,16 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Вывести в выходной файл процесс деления столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 22):
-  19935 | 22
- -198     906
- ----
-    13
-    -0
-    --
-    135
-   -132
-   ----
-      3
+19935 | 22
+-198     906
+----
+13
+-0
+--
+135
+-132
+----
+3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *

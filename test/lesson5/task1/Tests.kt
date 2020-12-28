@@ -328,6 +328,51 @@ class Tests {
                 450
             )
         )
+        assertEquals(
+            setOf("Кубок", "dd", "d"),
+            bagPacking(
+                mapOf("Кубок" to (100 to 10000), "ddd" to (500 to 2500),
+                    "Слиток" to (1000 to 5000), "dd" to (200 to 2600), "d" to (400 to 3000)),
+                1000
+            )
+        )
+        assertEquals(
+            setOf("7", "6", "5", "4", "3", "2", "0"),
+            bagPacking(
+                mapOf("0" to (414 to 48), "1" to (481 to 101), "2" to (177 to 92),
+                    "3" to (1 to 1), "4" to (237 to 85), "5" to (1 to 1),
+                    "6" to (148 to 106), "7" to (1 to 1)),
+                1000
+            )
+        )
+        assertEquals(
+            setOf("22", "19", "17", "5", "1"),
+            bagPacking(
+                mapOf("0" to (1 to 1), "1" to (1 to 8), "2" to (1 to 1),
+                    "3" to (1 to 1), "4" to (1 to 1), "5" to (284 to 238),
+                    "6" to (1 to 1), "7" to (1 to 1), "8" to (1 to 1),
+                    "9" to (1 to 1), "10" to (1 to 1), "11" to (1 to 1),
+                    "12" to (2 to 156), "13" to (1 to 1), "14" to (1 to 1),
+                    "15" to (1 to 1), "16" to (1 to 1), "17" to (270 to 217),
+                    "18" to (1 to 1), "19" to (398 to 212),
+                    "20" to (1 to 1), "21" to (1 to 1), "22" to (1 to 149)),
+                954
+            )
+        )
+//        assertEquals(
+//            setOf("Кубок"),
+//            bagPacking(
+//                mapOf("Кубок" to (5 to 2000), "Слиток" to (10 to 5000)),
+//                8
+//            )
+//        )
+//        assertEquals(
+//            emptySet<String>(),
+//            bagPacking(
+//                mapOf("Кубок" to (5 to 2000), "Слиток" to (10 to 5000)),
+//                4
+//            )
+//        )
     }
 
     // TODO: map task tests

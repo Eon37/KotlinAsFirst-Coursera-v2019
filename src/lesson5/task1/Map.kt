@@ -280,4 +280,40 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+val m = mutableMapOf<Pair<Int, Int>, Int?>()
+var tr = listOf<Pair<String, Pair<Int, Int>>>()
+
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+
+    tr = treasures.toList().filter { (_, p) -> p.first <= capacity }
+
+    for (i in 0..capacity) {
+        m[0 to i] = 0
+    }
+
+    var k = 0
+    for (treasure in tr) {
+        k++
+        for (s in 0..capacity) {
+            if (treasure.second.first > s) {
+                m[k to s] = m[k - 1 to s]
+            } else {
+                m[k to s] = maxOf(m[k - 1 to s]!!, m[k - 1 to s - treasure.second.first]!! + treasure.second.second)
+            }
+        }
+    }
+
+    val resSet = mutableSetOf<String>()
+    return findTreasures(tr.size, capacity, resSet) ?: emptySet()
+}
+
+fun findTreasures(k: Int, s: Int, resSet: MutableSet<String>): Set<String>? {
+    if (m[k to s] == 0) return null
+    if (m[k - 1 to s] == m[k to s]) findTreasures(k - 1, s, resSet)
+    else {
+        findTreasures(k - 1, s - tr[k - 1].second.first, resSet)
+        resSet.add(tr[k - 1].first)
+    }
+
+    return resSet.toSet()
+}
